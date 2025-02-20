@@ -7,7 +7,7 @@ int main(void)
 {
     board_init();
     board_init_led_pins();
-    board_init_usb_pins();
+    board_init_usb(HPM_USB0);
 
     intc_set_irq_priority(CONFIG_HPM_USBD_IRQn, 2);
     uartx_preinit();

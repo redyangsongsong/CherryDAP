@@ -9,7 +9,7 @@ set(CONFIG_DMA_MGR 1)
 find_package(hpm-sdk REQUIRED HINTS $ENV{HPM_SDK_BASE})
 
 project(hpm5300evklite_dap)
-
+sdk_compile_definitions(-DCONFIG_NDEBUG_CONSOLE=1)
 # for sync, use cherryusb from cherryDAP instead of hpm sdk middleware
 sdk_compile_definitions(-DCONFIG_USB_HS)
 sdk_inc(../../CherryUSB/common)

@@ -9,7 +9,9 @@
 #include "hpm_spi_drv.h"
 #include "hpm_clock_drv.h"
 #include "swd_host.h"
+#include "setting.h"
 #include <stdlib.h>
+#include "HSLink_Pro_expansion.h"
 
 #define SPI_MAX_SRC_CLOCK  (80000000U)
 #define SPI_MID_SRC_CLOCK  (60000000U)
@@ -32,8 +34,11 @@ void set_swj_clock_frequency(uint32_t clock)
     uint8_t i;
     int _freq = sclk_freq_in_hz;
     clk_src_t src_clock = clk_src_pll1_clk0; /* 800M */
-    if (BOOST_KEIL_SWD_FREQ == 1) {
+    if (HSLink_Setting.boost) {
         sclk_freq_in_hz *= 10;
+    }
+    if (sclk_freq_in_hz > SPI_MAX_SRC_CLOCK) {
+        sclk_freq_in_hz = SPI_MAX_SRC_CLOCK;
     }
     if (DAP_Data.debug_port == DAP_PORT_SWD) {
         spi_base = SWD_SPI_BASE;
@@ -109,4 +114,14 @@ uint8_t software_reset(void)
     ret |= swd_read_word(NVIC_AIRCR, &val);
     ret |= swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
     return ret;
+}
+
+void por_reset(void)
+{
+    if ((!VREF_ENABLE && HSLink_Setting.power.power_on)
+        || VREF_ENABLE) {
+        Power_Turn_Off();
+        board_delay_ms(10);
+        Power_Turn_On();
+    }
 }
